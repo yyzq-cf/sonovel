@@ -20,7 +20,8 @@ COPY assets ./assets
 # On arm64: linux-arm64 profile -> javet-v8-linux-arm64
 RUN mvn clean package \
     -Dmaven.test.skip=true \
-    -DjrePath=runtime
+    -DjrePath=runtime \
+    -Dlaunch4j.skip=true
 
 # Prepare runtime artifacts
 RUN mkdir -p /dist && \
