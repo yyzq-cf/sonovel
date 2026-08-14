@@ -1,0 +1,11 @@
+target/
+dist/
+downloads/
+logs/
+.git/
+.github/
+*.iml
+.idea/
+config-dev.ini
+.env
+Dockerfile

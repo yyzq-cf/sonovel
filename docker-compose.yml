@@ -1,0 +1,15 @@
+services:
+  sonovel:
+    image: ywsj/sonovel:latest
+    container_name: sonovel
+    ports:
+      - "7765:7765"
+    environment:
+      JAVA_OPTS: "-Dmode=web"
+      AUTH_USERNAME: "admin"
+      AUTH_PASSWORD: "admin123"
+    volumes:
+      - ./downloads:/sonovel/downloads
+      - ./config.ini:/sonovel/config.ini
+      - ./rules:/sonovel/rules
+    restart: unless-stopped

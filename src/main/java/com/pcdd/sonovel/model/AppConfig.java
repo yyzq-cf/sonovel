@@ -51,4 +51,9 @@ public class AppConfig {
     private String proxyHost;
     private Integer proxyPort;
 
+    // [auth]
+    private Integer authEnabled;
+    private String authUsername;
+    private String authPassword;
+
 }

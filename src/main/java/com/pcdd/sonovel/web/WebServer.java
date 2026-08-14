@@ -4,11 +4,15 @@ import cn.hutool.core.lang.Console;
 import com.pcdd.sonovel.core.AppConfigLoader;
 import com.pcdd.sonovel.web.servlet.*;
 import org.eclipse.jetty.ee11.servlet.DefaultServlet;
+import org.eclipse.jetty.ee11.servlet.FilterHolder;
 import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee11.servlet.ServletHolder;
+import org.eclipse.jetty.ee11.servlet.SessionHandler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.Jetty;
 import org.eclipse.jetty.util.resource.ResourceFactory;
+
+import java.util.EnumSet;
 
 import static org.fusesource.jansi.AnsiRenderer.render;
 
@@ -33,12 +37,23 @@ public class WebServer {
 
     private ServletContextHandler createServletContext() {
         ServletContextHandler context = new ServletContextHandler("/");
+        // 显式设置 SessionHandler（Jetty 12 不自动启用 session）
+        context.setSessionHandler(new SessionHandler());
         context.setBaseResource(ResourceFactory.of(context)
                 .newResource(WebServer.class.getClassLoader().getResource("static")));
         return context;
     }
 
     private void registerServlets(ServletContextHandler context) {
+        // 认证过滤器 — 拦截所有请求
+        context.addFilter(new FilterHolder(new AuthFilter()), "/*",
+                EnumSet.of(jakarta.servlet.DispatcherType.REQUEST));
+
+        // 认证相关端点
+        context.addServlet(LoginServlet.class, "/login");
+        context.addServlet(LoginServlet.class, "/logout");
+        context.addServlet(LoginServlet.class, "/auth-status");
+
         context.addServlet(BookFetchServlet.class, "/book-fetch");
         context.addServlet(BookDownloadServlet.class, "/book-download");
         context.addServlet(LocalBookListServlet.class, "/local-books");

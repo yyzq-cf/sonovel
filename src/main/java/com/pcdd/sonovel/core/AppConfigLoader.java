@@ -27,6 +27,7 @@ public class AppConfigLoader {
     private final String SELECTION_WEB = "web";
     private final String SELECTION_COOKIE = "cookie";
     private final String SELECTION_PROXY = "proxy";
+    private final String SELECTION_AUTH = "auth";
     public final AppConfig APP_CONFIG = loadConfig();
     private static volatile Setting cachedSetting;
 
@@ -109,6 +110,13 @@ public class AppConfigLoader {
         cfg.setProxyEnabled(setting.getInt("enabled", SELECTION_PROXY, 0));
         cfg.setProxyHost(getStrOrDefault(setting, "host", SELECTION_PROXY, "127.0.0.1"));
         cfg.setProxyPort(setting.getInt("port", SELECTION_PROXY, 7890));
+
+        // [auth] — 系统属性 -Dauth.username / -Dauth.password 可覆盖
+        cfg.setAuthEnabled(setting.getInt("enabled", SELECTION_AUTH, 0));
+        String sysUser = System.getProperty("auth.username");
+        String sysPass = System.getProperty("auth.password");
+        cfg.setAuthUsername(sysUser != null ? sysUser : getStrOrDefault(setting, "username", SELECTION_AUTH, "admin"));
+        cfg.setAuthPassword(sysPass != null ? sysPass : getStrOrDefault(setting, "password", SELECTION_AUTH, "admin123"));
 
         return cfg;
     }

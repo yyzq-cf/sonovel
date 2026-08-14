@@ -1,0 +1,60 @@
+# ============================================================
+# Multi-arch Dockerfile for so-novel
+# Builds on amd64 and arm64 via buildx + QEMU
+# Maven OS profiles auto-select the correct Javet V8 native lib
+# ============================================================
+
+# ---- Stage 1: Build ----
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+WORKDIR /build
+
+# Copy source
+COPY pom.xml .
+COPY src ./src
+COPY bundle ./bundle
+COPY assets ./assets
+
+# Maven build — OS-activated profile picks correct javet native lib
+# On amd64: linux-x64 profile -> javet-v8-linux-x86_64
+# On arm64: linux-arm64 profile -> javet-v8-linux-arm64
+RUN mvn clean package \
+    -Dmaven.test.skip=true \
+    -DjrePath=runtime
+
+# Prepare runtime artifacts
+RUN mkdir -p /dist && \
+    cp target/app-jar-with-dependencies.jar /dist/app.jar && \
+    cp bundle/config.ini /dist/ && \
+    cp -r bundle/rules /dist/
+
+# ---- Stage 2: Runtime ----
+FROM eclipse-temurin:21-jre-jammy
+
+LABEL org.opencontainers.image.source="https://github.com/freeok/so-novel"
+LABEL org.opencontainers.image.authors="ywsj"
+LABEL org.opencontainers.image.title="sonovel"
+LABEL org.opencontainers.image.description="So Novel - 网页内容处理与导出工具 (带认证)"
+
+WORKDIR /sonovel
+
+COPY --from=builder /dist/app.jar /dist/config.ini /dist/rules ./
+
+EXPOSE 7765
+
+# 环境变量：
+#   JAVA_OPTS      — JVM 参数，默认 -Dmode=web
+#   AUTH_USERNAME  — 登录用户名，覆盖 config.ini 中的值（默认 admin）
+#   AUTH_PASSWORD  — 登录密码，覆盖 config.ini 中的值（默认 admin123）
+#
+# 镜像默认开启认证 (config.ini [auth] enabled=1)
+# 关闭认证：docker run -e JAVA_OPTS="-Dmode=web" 并修改挂载的 config.ini
+ENTRYPOINT ["sh", "-c", "JAVA_OPTS=\"${JAVA_OPTS:--Dmode=web}\" && \
+  exec java $JAVA_OPTS \
+  -XX:+UseZGC \
+  -XX:+ZGenerational \
+  -Dfile.encoding=UTF-8 \
+  -Duser.timezone=GMT+08 \
+  ${AUTH_USERNAME:+-Dauth.username=$AUTH_USERNAME} \
+  ${AUTH_PASSWORD:+-Dauth.password=$AUTH_PASSWORD} \
+  -jar app.jar"]
