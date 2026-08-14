@@ -69,6 +69,45 @@
   </div>
 </div>
 
+<!-- 修改密码弹窗 -->
+<div x-cloak x-show="showChangePassword" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm"
+     x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+  <div class="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl ring-1 ring-gray-900/5"
+       x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+       x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+       x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-2 scale-95">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-semibold text-gray-800">修改密码</h3>
+      <button @click="showChangePassword = false" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+    </div>
+    <form @submit.prevent="handleChangePassword" class="flex flex-col gap-4">
+      <div>
+        <label class="text-sm font-medium text-gray-600 mb-1.5 block">原密码</label>
+        <input x-model="changePwdForm.oldPassword" type="password" placeholder="请输入原密码"
+               class="w-full px-4 py-3 border border-gray-200 rounded-xl text-base bg-gray-50 focus:outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10 transition-all">
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-600 mb-1.5 block">新用户名</label>
+        <input x-model="changePwdForm.newUsername" type="text" placeholder="新用户名"
+               class="w-full px-4 py-3 border border-gray-200 rounded-xl text-base bg-gray-50 focus:outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10 transition-all">
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-600 mb-1.5 block">新密码</label>
+        <input x-model="changePwdForm.newPassword" type="password" placeholder="新密码"
+               class="w-full px-4 py-3 border border-gray-200 rounded-xl text-base bg-gray-50 focus:outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10 transition-all">
+      </div>
+      <p x-show="changePwdError" x-text="changePwdError" class="text-sm text-red-500 text-center"></p>
+      <p x-show="changePwdSuccess" x-text="changePwdSuccess" class="text-sm text-green-600 text-center"></p>
+      <button type="submit" :disabled="changePwdLoading"
+              class="w-full py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        <span x-show="!changePwdLoading">确认修改</span>
+        <span x-show="changePwdLoading">修改中...</span>
+      </button>
+    </form>
+  </div>
+</div>
+
 <div class="max-w-5xl mx-auto px-4 py-4 sm:px-6 sm:py-6 flex flex-col min-h-screen" x-cloak x-show="!showLogin">
   <header class="relative flex flex-col items-center mb-6 sm:mb-8 pt-2 pb-1">
     <!-- LOGO -->
@@ -134,6 +173,12 @@
                :class="inputClass" placeholder="默认"
                type="number" x-model.number="settings.concurrency">
       </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-gray-100" x-show="authEnabled">
+      <button @click="showChangePassword = true"
+              class="text-sm text-primary hover:text-primary-hover px-3 py-1.5 border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors">
+        修改密码
+      </button>
     </div>
   </section>
 
@@ -592,6 +637,11 @@
       loginForm: { username: '', password: '' },
       loginError: '',
       loginLoading: false,
+      showChangePassword: false,
+      changePwdForm: { oldPassword: '', newUsername: '', newPassword: '' },
+      changePwdError: '',
+      changePwdSuccess: '',
+      changePwdLoading: false,
 
       get concurrencyMax() {
         return this.serverConfig.concurrency > 0 ? this.serverConfig.concurrency : 50
@@ -679,6 +729,35 @@
           this.loginError = error.message || '网络错误'
         } finally {
           this.loginLoading = false
+        }
+      },
+
+      async handleChangePassword() {
+        this.changePwdError = ''
+        this.changePwdSuccess = ''
+        this.changePwdLoading = true
+        try {
+          const data = await Api.changePassword(
+            this.changePwdForm.oldPassword,
+            this.changePwdForm.newUsername,
+            this.changePwdForm.newPassword
+          )
+          if (data.code === 200) {
+            this.changePwdSuccess = data.message || '修改成功，请重新登录'
+            setTimeout(() => {
+              this.showChangePassword = false
+              this.changePwdForm = { oldPassword: '', newUsername: '', newPassword: '' }
+              this.changePwdSuccess = ''
+              this.authenticated = false
+              this.showLogin = true
+            }, 1500)
+          } else {
+            this.changePwdError = data.message || '修改失败'
+          }
+        } catch (error) {
+          this.changePwdError = error.message || '网络错误'
+        } finally {
+          this.changePwdLoading = false
         }
       },
 

@@ -53,6 +53,7 @@ public class WebServer {
         context.addServlet(LoginServlet.class, "/login");
         context.addServlet(LoginServlet.class, "/logout");
         context.addServlet(LoginServlet.class, "/auth-status");
+        context.addServlet(LoginServlet.class, "/change-password");
 
         context.addServlet(BookFetchServlet.class, "/book-fetch");
         context.addServlet(BookDownloadServlet.class, "/book-download");

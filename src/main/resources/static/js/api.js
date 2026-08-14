@@ -17,11 +17,18 @@ const Api = {
     return fetch('/logout', { method: 'POST' }).then(r => r.json())
   },
 
+  changePassword(oldPassword, newUsername, newPassword) {
+    return fetch('/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oldPassword, newUsername, newPassword })
+    }).then(r => r.json())
+  },
+
   // ===== 统一请求封装（401 自动弹登录框）=====
   _fetch(url, options) {
     return fetch(url, options).then(resp => {
       if (resp.status === 401) {
-        // 触发自定义事件通知前端弹登录框
         window.dispatchEvent(new CustomEvent('auth-required'))
         return Promise.reject(new Error('未登录或登录已过期'))
       }
