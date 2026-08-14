@@ -132,10 +132,8 @@ public class LoginServlet extends HttpServlet {
         // 定位 config.ini 文件路径
         String configFilePath = System.getProperty("config.file");
         if (StrUtil.isBlank(configFilePath) || !FileUtil.exist(configFilePath)) {
-            // 默认路径：与 jar 同目录的 config.ini
-            String jarDir = new File(LoginServlet.class.getProtectionDomain()
-                    .getCodeSource().getLocation().toURI()).getParent();
-            configFilePath = Paths.get(jarDir, "config.ini").toString();
+            // 默认路径：当前工作目录下的 config.ini
+            configFilePath = Paths.get(System.getProperty("user.dir"), "config.ini").toString();
         }
 
         File configFile = new File(configFilePath);
@@ -147,8 +145,8 @@ public class LoginServlet extends HttpServlet {
 
         // 更新 config.ini 中的 [auth] 段
         Setting setting = new Setting(configFile.getAbsolutePath(), StandardCharsets.UTF_8, false);
-        setting.set("username", "auth", newUsername);
-        setting.set("password", "auth", newPassword);
+        setting.setByGroup("username", "auth", newUsername);
+        setting.setByGroup("password", "auth", newPassword);
         setting.store(configFile.getAbsolutePath());
 
         // 更新内存中的配置
