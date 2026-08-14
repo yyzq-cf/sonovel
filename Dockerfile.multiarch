@@ -38,7 +38,8 @@ LABEL org.opencontainers.image.description="So Novel - 网页内容处理与导�
 
 WORKDIR /sonovel
 
-COPY --from=builder /dist/app.jar /dist/config.ini /dist/rules ./
+COPY --from=builder /dist/app.jar /dist/config.ini ./
+COPY --from=builder /dist/rules ./rules/
 
 EXPOSE 7765
 
