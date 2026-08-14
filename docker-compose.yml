@@ -6,10 +6,10 @@ services:
       - "7765:7765"
     environment:
       JAVA_OPTS: "-Dmode=web"
+      # 修改用户名密码（默认 admin/admin123）
       AUTH_USERNAME: "admin"
       AUTH_PASSWORD: "admin123"
     volumes:
+      # 只挂载下载目录，config.ini 和 rules 用镜像内置的
       - ./downloads:/sonovel/downloads
-      - ./config.ini:/sonovel/config.ini
-      - ./rules:/sonovel/rules
     restart: unless-stopped
