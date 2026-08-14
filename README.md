@@ -1,240 +1,95 @@
-<div align="center">
-  <img src="assets/logo.png" style="width: 128px;"/>
-  <h1 align="center">So Novel</h1>
-  <h4 align="center"></h4>
-</div>
+# So Novel (Docker 认证版)
 
-<div align="center">
+> 基于 [freeok/so-novel](https://github.com/freeok/so-novel) 修改，原项目作者 **pcdd / freeok**，遵循原项目 MIT 许可证。
 
-[![zread](https://img.shields.io/badge/Ask_Zread-_.svg?style=flat&color=00b0aa&labelColor=000000&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQuOTYxNTYgMS42MDAxSDIuMjQxNTZDMS44ODgxIDEuNjAwMSAxLjYwMTU2IDEuODg2NjQgMS42MDE1NiAyLjI0MDFWNC45NjAxQzEuNjAxNTYgNS4zMTM1NiAxLjg4ODEgNS42MDAxIDIuMjQxNTYgNS42MDAxSDQuOTYxNTZDNS4zMTUwMiA1LjYwMDEgNS42MDE1NiA1LjMxMzU2IDUuNjAxNTYgNC45NjAxVjIuMjQwMUM1LjYwMTU2IDEuODg2NjQgNS4zMTUwMiAxLjYwMDEgNC45NjE1NiAxLjYwMDFaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik00Ljk2MTU2IDEwLjM5OTlIMi4yNDE1NkMxLjg4ODEgMTAuMzk5OSAxLjYwMTU2IDEwLjY4NjQgMS42MDE1NiAxMS4wMzk5VjEzLjc1OTlDMS42MDE1NiAxNC4xMTM0IDEuODg4MSAxNC4zOTk5IDIuMjQxNTYgMTQuMzk5OUg0Ljk2MTU2QzUuMzE1MDIgMTQuMzk5OSA1LjYwMTU2IDE0LjExMzQgNS42MDE1NiAxMy43NTk5VjExLjAzOTlDNS42MDE1NiAxMC42ODY0IDUuMzE1MDIgMTAuMzk5OSA0Ljk2MTU2IDEwLjM5OTlaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik0xMy43NTg0IDEuNjAwMUgxMS4wMzg0QzEwLjY4NSAxLjYwMDEgMTAuMzk4NCAxLjg4NjY0IDEwLjM5ODQgMi4yNDAxVjQuOTYwMUMxMC4zOTg0IDUuMzEzNTYgMTAuNjg1IDUuNjAwMSAxMS4wMzg0IDUuNjAwMUgxMy43NTg0QzE0LjExMTkgNS42MDAxIDE0LjM5ODQgNS4zMTM1NiAxNC4zOTg0IDQuOTYwMVYyLjI0MDFDMTQuMzk4NCAxLjg4NjY0IDE0LjExMTkgMS42MDAxIDEzLjc1ODQgMS42MDAxWiIgZmlsbD0iI2ZmZiIvPgo8cGF0aCBkPSJNNCAxMkwxMiA0TDQgMTJaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik00IDEyTDEyIDQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K&logoColor=ffffff)](https://zread.ai/freeok/so-novel)
-[![GitHub License](https://img.shields.io/github/license/freeok/so-novel?style=flat-square)](https://github.com/freeok/so-novel/blob/main/LICENSE)
-[![Latest Release](https://img.shields.io/github/v/release/freeok/so-novel)](https://github.com/freeok/so-novel/releases/latest)
-[![GitHub Downloads](https://img.shields.io/github/downloads/freeok/so-novel/total.svg?style=flat-square)](https://github.com/freeok/so-novel/releases/latest)
+## 📌 项目说明
 
-</div>
+本项目在原版 [so-novel](https://github.com/freeok/so-novel) 基础上做了以下修改：
 
-## 概述
+### 新增功能
 
-**So Novel** 是一款通用的网页内容处理与导出工具，它致力于帮助用户高效地从网页中提取结构化信息，并将其灵活导出为
-EPUB、TXT、PDF 等多种标准电子文档格式。适用于学习采集、格式转换、电子书制作等场景。
+| 功能 | 说明 |
+|---|---|
+| 🔐 **Web 用户认证** | 新增用户名密码登录系统，默认开启，防止未授权访问 |
+| 🐳 **多架构 Docker 镜像** | 支持 `amd64` + `arm64` 双平台，镜像内置编译无需本地 JDK |
+| 📦 **零配置启动** | 不挂载任何配置文件，`docker run` 即用，默认 `admin/admin123` |
+| 🔄 **环境变量改密码** | 通过 `AUTH_USERNAME` / `AUTH_PASSWORD` 环境变量自定义账号密码 |
 
-## 预览
+### 改动的文件
 
-<details>
-  <summary>点击查看图片</summary>
+| 文件 | 改动内容 |
+|---|---|
+| `AppConfig.java` | 新增 `authEnabled` / `authUsername` / `authPassword` 字段 |
+| `AppConfigLoader.java` | 加载 `[auth]` 配置段，支持 `-Dauth.username` / `-Dauth.password` 系统属性覆盖 |
+| `AuthFilter.java` | **新增** — 拦截未认证 API 请求返回 401 |
+| `LoginServlet.java` | **新增** — 处理登录 / 登出 / 认证状态检查 |
+| `WebServer.java` | 注册 AuthFilter 和 LoginServlet，启用 SessionHandler |
+| `index.html` | 新增登录弹窗 + 认证检查逻辑 + 修改密码 UI |
+| `api.js` | 新增认证 API + 统一 401 拦截处理 |
+| `bundle/config.ini` | 新增 `[auth]` 配置段，默认 `enabled = 1` |
+| `Dockerfile.multiarch` | **新增** — 多阶段多架构构建 |
+| `docker-compose.yml` | **新增** — 开箱即用的 compose 文件 |
 
-### TUI 预览 (Text-based User Interface)
+## 🚀 快速开始
 
-![preview-tui.png](assets/preview-tui.png)
-
-### WebUI 预览 (网页版)
-
-![preview-webui.jpg](assets/preview-webui.jpg)
-
-### CLI 预览 (Command Line Interface)
-
-![preview-cli.png](assets/preview-cli.png)
-
-</details>
-
-## 安装
-
-### 📦 手动下载压缩包
-
-<https://github.com/freeok/so-novel/releases>
-
-### 🪟 Windows
-
-#### 1. PowerShell
-
-```powershell
-# powershell
-irm https://raw.githubusercontent.com/freeok/so-novel/main/bin/windows-install.ps1 | iex
-```
-
-#### 2. CMD (命令提示符)
-
-```cmd
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/freeok/so-novel/main/bin/windows-install.ps1 | iex"
-```
-
-### 🐧 Linux
+### Docker 一键启动
 
 ```bash
-bash <(curl -sSL https://raw.githubusercontent.com/freeok/so-novel/main/bin/linux-install.sh)
+docker run -d \
+  --name sonovel \
+  -p 7765:7765 \
+  -e JAVA_OPTS="-Dmode=web" \
+  -e AUTH_USERNAME="admin" \
+  -e AUTH_PASSWORD="admin123" \
+  -v ./downloads:/sonovel/downloads \
+  ywsj/sonovel:latest
 ```
 
-### 🍺 Homebrew
-
-```bash
-brew tap ownia/homebrew-ownia
-# https://docs.brew.sh/Tap-Trust#why-tap-trust-exists
-brew trust --formula ownia/homebrew-ownia/so-novel
-brew install so-novel
-```
-
-### 🍨 Scoop
-
-```bash
-scoop bucket add freeok https://github.com/freeok/scoop-bucket
-scoop install freeok/so-novel
-```
-
-### 🐳 Docker
-
-**方式 1: 脚本一键安装**
-
-```bash
-curl -sSL https://raw.githubusercontent.com/freeok/so-novel/main/bin/docker-install.sh | bash
-```
-
-**方式 2: Docker Compose (NAS 首选)**
+### Docker Compose
 
 ```yaml
 services:
   sonovel:
-    image: ghcr.io/freeok/sonovel:latest
+    image: ywsj/sonovel:latest
     container_name: sonovel
     ports:
       - "7765:7765"
     environment:
       JAVA_OPTS: "-Dmode=web"
+      AUTH_USERNAME: "admin"      # 修改用户名
+      AUTH_PASSWORD: "admin123"   # 修改密码
     volumes:
-      - sonovel_data:/sonovel
+      - ./downloads:/sonovel/downloads
     restart: unless-stopped
-
-volumes:
-  sonovel_data:
 ```
-
-**方式 3: Docker Run**
 
 ```bash
-# 如需挂载，请提前准备好 config.ini 文件、rules 目录
-docker run -d \
-  --name sonovel \
-  -v /sonovel/config.ini:/sonovel/config.ini \
-  -v /sonovel/rules:/sonovel/rules \
-  -v /sonovel/downloads:/sonovel/downloads \
-  -p 7765:7765 \
-  -e JAVA_OPTS='-Dmode=web' \
-  ghcr.io/freeok/sonovel:latest
+docker compose up -d
 ```
 
-**从源码构建 Docker 镜像**
+浏览器访问 `http://你的IP:7765`，输入用户名密码登录即可。
 
-```bash
-# 确保已安装 git、jdk 21、maven
-sudo apt update
-sudo apt install -y git
-sudo apt install -y openjdk-21-jdk
-sudo apt install -y maven
+### 环境变量说明
 
-# 验证安装
-git -v
-javac -version
-mvn -v
+| 变量 | 说明 | 默认值 |
+|---|---|---|
+| `JAVA_OPTS` | JVM 启动参数 | `-Dmode=web` |
+| `AUTH_USERNAME` | 登录用户名 | `admin` |
+| `AUTH_PASSWORD` | 登录密码 | `admin123` |
 
-# 构建项目
-git clone https://github.com/freeok/so-novel.git && cd so-novel
-# arch: [x64|arm64]
-sh bin/release-linux.sh [arch]
+> 修改密码只需修改环境变量后重启容器，无需挂载配置文件。
 
-# 构建 Docker 镜像
-cp -r target/sonovel-linux_[arch]/{app.jar,config.ini,rules} .
-docker build -t sonovel .
-```
+## 📖 原项目功能
 
-> [!TIP]
->
-> 为获得最佳阅读体验，建议使用以下电子书阅读器：
->
-> **桌面端**
->
-> - [Readest](https://readest.com/)
-> - [Koodo Reader](https://www.koodoreader.com/zh)
-> - [Calibre](https://calibre-ebook.com/)
-> - [Neat Reader（网页版）](https://www.neat-reader.cn/webapp)
->
-> **移动端**
->
-> - [Readest](https://readest.com/)
-> - [Apple Books](https://www.apple.com/apple-books/)
-> - [Moon+ Reader（静读天下）](https://moondownload.com/chinese.html)
-> - [Kindle](https://apps.apple.com/us/app/amazon-kindle/id302584613)
->
-> 如需转换为其它电子书格式，可使用：
->
-> - [FreeConvert](https://www.freeconvert.com/zh)
-> - [Calibre](https://calibre-ebook.com/zh_CN)
->
-> 修复 WPS、掌阅等软件无法打开 so-novel 下载的 EPUB：https://github.com/freeok/so-novel/discussions/199
+So Novel 是一款通用的网页内容处理与导出工具，支持从多个书源搜索、下载网络小说，导出为 EPUB / TXT / HTML / PDF 等格式。
 
-## 自定义 JVM 系统属性
+更多功能说明请参考 [原项目 README](https://github.com/freeok/so-novel)。
 
-| 参数            | 说明                     | 默认值          |
-|---------------|------------------------|--------------|
-| -Dmode        | 启动模式，可选值：tui\|cli\|web | tui          |
-| -Dconfig.file | 配置文件路径                 | ./config.ini |
+## 📄 许可证
 
-用法
+MIT License — 遵循原项目许可证。
 
-> [!NOTE]
->
-> Windows 修改 [sonovel.l4j.ini](bundle/sonovel.l4j.ini)
->
-> Linux 修改  [run-linux.sh](bundle/run-linux.sh)
->
-> macOS 修改  [run-macos.sh](bundle/run-macos.sh)
+## 🙏 致谢
 
-## 使用本地 JDK / JRE 启动
-
-如果你不想使用内置 JRE（runtime 目录），可以通过本地 JDK / JRE 启动程序
-
-Windows 使用脚本 start-custom-jre.cmd：
-
-```cmd
-REM --------------------------------------------------
-REM 高级用户使用自定义 JRE 启动程序
-REM 将 "your_path\java.exe" 替换为你的 JRE 路径，例如：
-REM "C:\Java\jdk-21\bin\java.exe"
-REM --------------------------------------------------
-@echo off
-your_path\java.exe ^
-  -XX:+UseZGC ^
-  -XX:+ZGenerational ^
-  -Dconfig.file=config.ini ^
-  -Dmode=tui ^
-  -Dfile.encoding=GBK|Big5 ^
-  -jar app.jar
-```
-
-Linux / macOS：[run-linux.sh](bundle/run-linux.sh) / [run-macos.sh](bundle/run-macos.sh) 修改 java 路径
-
-## 常见问题
-
-https://github.com/freeok/so-novel/issues?q=label%3A%22usage%20question%22
-
-## 讨论
-
-https://github.com/freeok/so-novel/discussions?discussions_q=
-
-## 支持 & 赞助
-
-如果觉得有所帮助，欢迎扫码赞助☕、点击项目主页顶部的⭐Star 按钮支持！
-
-🚀这将是我们持续更新的动力源泉！同时，你也能第一时间获取到最新的更新动态。💡❤️
-
-| 支付宝赞助                                                           | 微信赞助                                                           |
-|-----------------------------------------------------------------|----------------------------------------------------------------|
-| <img src="assets/donation-alipay.png" alt="支付宝收款码" width="197"> | <img src="assets/donation-wechat.jpg" alt="微信赞赏码" width="197"> |
-
-[项目赞助者列表](./SPONSORS.md)
-
-## 免责声明
-
-在使用本工具前，请务必仔细阅读我们的[法律免责声明](bundle/DISCLAIMER.md)。使用本工具即表示您已阅读、理解并同意遵守所有条款。
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/chart?repos=freeok/so-novel&type=date&legend=top-left&sealed_token=5phfE_GEDrDmXeO6LQ3d-73K_Z4w75PKWLzMkb1UqUVwFszcO9t76DKuf9l4wYgZ-ik27ocHo67YGTpn8oCGHq0_Iy_3FKy-mi8H8BY6S3x0j5HYYO9__A)](https://www.star-history.com/?repos=freeok%2Fso-novel&type=date&legend=top-left)
+- 原项目：[freeok/so-novel](https://github.com/freeok/so-novel)
+- 原作者：pcdd / freeok
