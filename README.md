@@ -11,7 +11,8 @@
 | 功能 | 说明 |
 |---|---|
 | 🔐 **Web 用户认证** | 新增用户名密码登录系统，默认开启，防止未授权访问 |
-| 🐳 **多架构 Docker 镜像** | 支持 `amd64` + `arm64` 双平台，镜像内置编译无需本地 JDK |
+| 🛡️ **防暴力破解** | 同一 IP 连续失败 5 次自动锁定 15 分钟 |
+| 🐳 **Docker 镜像** | 支持 `amd64` 平台，镜像内置编译无需本地 JDK |
 | 📦 **零配置启动** | 不挂载任何配置文件，`docker run` 即用，默认 `admin/admin123` |
 | 🔄 **环境变量改密码** | 通过 `AUTH_USERNAME` / `AUTH_PASSWORD` 环境变量自定义账号密码 |
 
@@ -22,12 +23,12 @@
 | `AppConfig.java` | 新增 `authEnabled` / `authUsername` / `authPassword` 字段 |
 | `AppConfigLoader.java` | 加载 `[auth]` 配置段，支持 `-Dauth.username` / `-Dauth.password` 系统属性覆盖 |
 | `AuthFilter.java` | **新增** — 拦截未认证 API 请求返回 401 |
-| `LoginServlet.java` | **新增** — 处理登录 / 登出 / 认证状态检查 |
+| `LoginServlet.java` | **新增** — 处理登录 / 登出 / 认证状态检查 / 修改密码 / 防暴力破解 |
 | `WebServer.java` | 注册 AuthFilter 和 LoginServlet，启用 SessionHandler |
 | `index.html` | 新增登录弹窗 + 认证检查逻辑 + 修改密码 UI |
 | `api.js` | 新增认证 API + 统一 401 拦截处理 |
 | `bundle/config.ini` | 新增 `[auth]` 配置段，默认 `enabled = 1` |
-| `Dockerfile.multiarch` | **新增** — 多阶段多架构构建 |
+| `Dockerfile.multiarch` | **新增** — 多阶段 Docker 构建（amd64） |
 | `docker-compose.yml` | **新增** — 开箱即用的 compose 文件 |
 
 ## 🚀 快速开始
@@ -39,8 +40,8 @@ docker run -d \
   --name sonovel \
   -p 7765:7765 \
   -e JAVA_OPTS="-Dmode=web" \
-  -e AUTH_USERNAME="admin" \
-  -e AUTH_PASSWORD="admin123" \
+  -e AUTH_USERNAME=*** \
+  -e AUTH_PASSWORD=*** \
   -v ./downloads:/sonovel/downloads \
   ywsj/sonovel:latest
 ```
