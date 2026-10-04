@@ -1,0 +1,84 @@
+name: 🐳 Docker Multi-Arch Publish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'bundle/**'
+      - 'assets/**'
+      - 'pom.xml'
+      - 'Dockerfile'
+      - 'docker-entrypoint.sh'
+      - 'scripts/**'
+      - '.github/workflows/docker-publish.yml'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ywsj/sonovel
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📝 Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-,format=short
+          labels: |
+            org.opencontainers.image.title=So Novel
+            org.opencontainers.image.description=网络小说下载器 (多架构 amd64/arm64)
+            org.opencontainers.image.source=https://github.com/yyzq-cf/sonovel
+
+      - name: 🧰 Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: 🧰 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔑 Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🔑 Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏗️ Build & Push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ghcr.io/${{ github.repository_owner }}/sonovel:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+
+      - name: ✅ Image info
+        run: |
+          echo "::notice::Published ${{ env.IMAGE_NAME }} → tags:"
+          echo "${{ steps.meta.outputs.tags }}" | sed 's/^/  /'
+          echo "platforms: linux/amd64, linux/arm64"
